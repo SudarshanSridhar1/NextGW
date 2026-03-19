@@ -31,7 +31,7 @@ for zone in TEXAS_ZONES:
     zone_ts = demand[str(zone)].values          # (8784,)
     buses_z = tx_bus[tx_bus["zone_id"] == zone]
     for _, row in buses_z.iterrows():
-        cols[int(row["bus_id"])] = np.round(zone_ts * row["share"], 2)
+        cols[int(row["bus_id"])] = np.round(zone_ts * row["share"], 1)
 
 # sort bus columns numerically, time first
 sorted_bus_ids = sorted(k for k in cols if k != "UTC Time")
@@ -39,6 +39,7 @@ out = pd.DataFrame({"UTC Time": cols["UTC Time"],
                     **{b: cols[b] for b in sorted_bus_ids}})
 
 out.to_csv(f"{BASE}/texas_demand.csv", index=False)
+out.to_csv(f"{BASE}/texas_demand.csv.gz", index=False, compression={"method": "gzip", "compresslevel": 9})
 
 print(f"Saved texas_demand.csv")
 print(f"  Timesteps : {len(out)}")
