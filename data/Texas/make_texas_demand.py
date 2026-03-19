@@ -31,7 +31,7 @@ for zone in TEXAS_ZONES:
     zone_ts = demand[str(zone)].values          # (8784,)
     buses_z = tx_bus[tx_bus["zone_id"] == zone]
     for _, row in buses_z.iterrows():
-        cols[int(row["bus_id"])] = zone_ts * row["share"]
+        cols[int(row["bus_id"])] = np.round(zone_ts * row["share"], 2)
 
 # sort bus columns numerically, time first
 sorted_bus_ids = sorted(k for k in cols if k != "UTC Time")
