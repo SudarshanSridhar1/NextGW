@@ -111,3 +111,51 @@ This HTML file can be opened in any browser and shared independently of the Pyth
 ## Required Pyton Packages 
 
 Run "pip install pandas numpy geopandas plotly shapely scipy" to install required pyton packages before running the script.
+## Natural Earth Boundary Files
+
+This project uses two Natural Earth geospatial datasets:
+
+- `ne_10m_admin_1_states_provinces`
+- `ne_10m_lakes`
+
+### What Natural Earth is
+
+Natural Earth is a public domain source of global map boundary and physical geography data commonly used in GIS and geospatial visualization workflows. It provides shapefiles for country boundaries, administrative boundaries, coastlines, lakes, and other physical features at multiple map scales.
+
+In this project, the Natural Earth files are used as the geographic base layers needed to constrain the Voronoi polygons to realistic land boundaries.
+
+### Where these files came from
+
+These shapefiles were downloaded from the Natural Earth dataset distribution. The relevant layers are:
+
+- **Admin 1 States/Provinces**: used to obtain U.S. state polygons
+- **Lakes**: used to identify and remove the Great Lakes from the visible land mask
+
+The `10m` in the filenames refers to the dataset scale. This is the highest-resolution Natural Earth standard product and is appropriate for a national-scale interactive map where state outlines and major water bodies need to look reasonably clean.
+
+### Why these files are needed
+
+The Voronoi step creates polygons based only on geometric proximity between substation coordinates. On its own, that produces raw polygons that can extend:
+
+- beyond the United States
+- into oceans
+- across the Great Lakes
+- into regions that should not appear in a continental U.S. map
+
+The Natural Earth files are used to correct that.
+
+#### `ne_10m_admin_1_states_provinces`
+This layer is needed to build the continental U.S. clipping boundary.
+
+#### `ne_10m_lakes`
+This layer is needed to remove major inland water bodies, specifically the Great Lakes, from the mainland mask.
+
+### Why this matters for the visualization
+
+These files are not used to compute hosting capacity values. They are used to improve the geographic correctness and readability of the map.
+
+More specifically, they ensure that:
+- each substation polygon is displayed only over land
+- the map is limited to the study area of interest
+- large lakes do not appear as filled service regions
+- the final visualization looks more like a meaningful regional partition instead of a raw mathematical tessellation
