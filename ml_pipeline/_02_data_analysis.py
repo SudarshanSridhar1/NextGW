@@ -1,10 +1,4 @@
 import pandas as pd
-import torch as tr
-import torch_geometric
-import torch.nn as nn
-import torch_geometric.nn as gnn
-import torch_geometric.transforms as T
-
 
 df_nodes = pd.read_csv(r"ml_pipeline\csv\busWestern.csv", index_col="bus_i")
 df_edges = pd.read_csv(r"ml_pipeline\csv\branchWestern.csv")

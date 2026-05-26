@@ -2,7 +2,7 @@ import scipy.io
 import pandas as pd
 import os
 
-mat = scipy.io.loadmat(r'ml_pipeline\csv\case_western.mat')
+mat = scipy.io.loadmat(r'ml_pipeline\csv\_00_case_texas.mat')
 mpc = mat['mpc'][0, 0]
 
 # --- bus (2000 x 17): 13 standard + 4 OPF result columns ---
@@ -37,10 +37,10 @@ gencost = pd.DataFrame(mpc['gencost'], columns=gencost_cols)
 out_dir = r'ml_pipeline\csv'
 os.makedirs(out_dir, exist_ok=True)
 
-bus.to_csv(os.path.join(out_dir, 'busWestern.csv'), index=False)
-gen.to_csv(os.path.join(out_dir, 'genWestern.csv'), index=False)
-branch.to_csv(os.path.join(out_dir, 'branchWestern.csv'), index=False)
-gencost.to_csv(os.path.join(out_dir, 'gencostWestern.csv'), index=False)
+bus.to_csv(os.path.join(out_dir, 'busTexas.csv'), index=False)
+gen.to_csv(os.path.join(out_dir, 'genTexas.csv'), index=False)
+branch.to_csv(os.path.join(out_dir, 'branchTexas.csv'), index=False)
+gencost.to_csv(os.path.join(out_dir, 'gencostTexas.csv'), index=False)
 
 print(f"bus:     {bus.shape}")
 print(f"gen:     {gen.shape}")
