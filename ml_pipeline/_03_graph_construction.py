@@ -11,7 +11,7 @@ import sys
 import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
-sys.path.append(parent_dir)
+sys.path.insert(0, parent_dir)
 
 from data.Texas.ptdf import compute_ptdf
 
@@ -25,23 +25,15 @@ def load_demand(demand_path, bus_ids): #From hosting_capacity_parallel_mod.py
 
     return df.iloc[best_start : best_start + 100].values.astype(float)
 
-def graph_data(case="texas", cluster=True):
-    if case == "western" and not cluster:
-        df_edges = pd.read_csv(rf"ml_pipeline\csv\_11_branchWestern.csv")
-        df_nodes = pd.read_csv(rf"ml_pipeline\csv\_12_busWestern.csv", index_col="bus_i")
-        df_generators = pd.read_csv(rf"ml_pipeline\csv\_13_genWestern.csv")
-    elif case == "texas" and not cluster:
-        df_edges = pd.read_csv(rf"ml_pipeline\csv\_01_branchTexas.csv")
-        df_nodes = pd.read_csv(rf"ml_pipeline\csv\_02_busTexas.csv", index_col="bus_i")
-        df_generators = pd.read_csv(rf"ml_pipeline\csv\_03_genTexas.csv")
-    elif case == "western" and not cluster:
-        df_edges = pd.read_csv(rf"csv/_11_branchWestern.csv")
-        df_nodes = pd.read_csv(rf"csv/_12_busWestern.csv", index_col="bus_i")
-        df_generators = pd.read_csv(rf"csv/_13_genWestern.csv")
-    else:
-        df_edges = pd.read_csv(rf"csv/_01_branchTexas.csv")
-        df_nodes = pd.read_csv(rf"csv/_02_busTexas.csv", index_col="bus_i")
-        df_generators = pd.read_csv(rf"csv/_03_genTexas.csv")
+def graph_data(case="texas"):
+    if case == "western":
+        df_edges = pd.read_csv(os.path.join(current_dir, "csv", "_11_branchWestern.csv"))
+        df_nodes = pd.read_csv(os.path.join(current_dir, "csv", "_12_busWestern.csv"), index_col="bus_i")
+        df_generators = pd.read_csv(os.path.join(current_dir, "csv", "_13_genWestern.csv"))
+    else:  # texas
+        df_edges = pd.read_csv(os.path.join(current_dir, "csv", "_01_branchTexas.csv"))
+        df_nodes = pd.read_csv(os.path.join(current_dir, "csv", "_02_busTexas.csv"), index_col="bus_i")
+        df_generators = pd.read_csv(os.path.join(current_dir, "csv", "_03_genTexas.csv"))
     
     df_nodes.drop(columns=["lam_P", "lam_Q", "mu_Vmax", "mu_Vmin", "Gs", "Bs"], inplace=True)
     df_edges.drop(columns=["rateB", "rateC", "angle", "angmin", "angmax", 
@@ -82,7 +74,7 @@ def graph_data(case="texas", cluster=True):
 
     #PTDF
     if case == "texas":
-        ptdf, _, _, _ = compute_ptdf(r"ml_pipeline\csv\_00_case_texas.mat") #TODO: Try Top-K for GNN
+        ptdf, _, _, _ = compute_ptdf(os.path.join(current_dir, "csv", "_00_case_texas.mat")) #TODO: Try Top-K for GNN
         #print(ptdf.shape)
         ptdf_scalar = ptdf.sum(axis=0)
         #print(ptdf_scalar.shape)
@@ -93,9 +85,8 @@ def graph_data(case="texas", cluster=True):
     #Demand
     if case == "texas":
         bus_ids = df_nodes.index.astype(int).tolist()
-        demand = load_demand(r"data\Texas\texas_demand.csv.gz", bus_ids=bus_ids)
+        demand = load_demand(os.path.join(parent_dir, "data", "Texas", "texas_demand.csv.gz"), bus_ids=bus_ids)
         rhs_scalar = demand.sum(axis=0)
-        rhs_all = demand.sum(axis=1)
         #print(rhs_all.shape)
         #print(rhs_scalar.shape)
     node_data["rhs_scalar"] = rhs_scalar
@@ -106,17 +97,11 @@ def graph_data(case="texas", cluster=True):
 
     #------------------------TARGETS------------------------#
     if case == "western":
-        if cluster:
-            df_targets = pd.read_csv(rf"csv/_16_hosting_capacity_western.csv", index_col="bus_id")
-        else:
-            df_targets = pd.read_csv(rf"ml_pipeline\csv\_16_hosting_capacity_western.csv", index_col="bus_id")
+        df_targets = pd.read_csv(os.path.join(current_dir, "csv", "_16_hosting_capacity_western.csv"), index_col="bus_id")
         df_targets = df_targets.reindex(df_nodes.index)
         y = tr.tensor(df_targets["hosting_capacity"].values, dtype=tr.float32).unsqueeze(1)
     elif case == "texas":
-        if cluster:
-            df_targets = pd.read_csv(rf"csv/_06_texas_v0.csv", index_col="bus_id")
-        else:
-            df_targets = pd.read_csv(rf"ml_pipeline\csv\_06_texas_v0.csv", index_col="bus_id")
+        df_targets = pd.read_csv(os.path.join(current_dir, "csv", "_06_texas_v0.csv"), index_col="bus_id")
         df_targets = df_targets.reindex(df_nodes.index)
         y = tr.tensor(df_targets["HC_network_MW"].values, dtype=tr.float32).unsqueeze(1)
 
@@ -148,55 +133,39 @@ def graph_data(case="texas", cluster=True):
     Pd_arr    = df_nodes["Pd"].values
     Pf_base   = ptdf @ (g_per_bus - Pd_arr)               # [n_active_branch] DC base flows
 
-    return data, ptdf, rhs_all, F_max_branches, Pf_base
+    return data, ptdf, demand, F_max_branches, Pf_base
 
-data, _, _, _, _ = graph_data("texas", cluster=False)
+#data, _, _, _, _ = graph_data("texas", cluster=os.name != 'nt')
 
 def apply_physics_constraints(pred, x0, edge_index, edge_attr,
-                              ptdf=None, rhs_all=None,
+                              ptdf=None, demand=None,
                               F_max_branches=None, Pf_base=None):
-    dL    = pred.squeeze()   # [N_BUS] predicted hosting capacity [MW]
-    G_max = x0[:, 21]        # max generation per bus [MW]  (active gens, summed)
-    G_min = x0[:, 22]        # min generation per bus [MW]  (active gens, summed)
+    dL    = pred.squeeze()              # [N_BUS] predicted hosting capacity [MW]
+    G_max = x0[:, 21]                   # [N_BUS] sum of Pmax over active gens at each bus
+    G_min = x0[:, 22]                   # [N_BUS] sum of Pmin over active gens at each bus
 
-    if rhs_all is not None:
-        rhs_t = tr.tensor(rhs_all, dtype=tr.float32, device=dL.device)  # [n_timestep]
-        # 1. sum(g) = rhs + dL, g <= G_max  →  dL <= sum(G_max) - rhs  (binding at peak load)
-        loss_headroom = F.relu(dL - (G_max.sum() - rhs_t.max())).mean()
-        # 2. sum(g) = rhs + dL, g >= G_min  →  dL >= sum(G_min) - rhs  (binding at min load)
-        loss_gmin = F.relu((G_min.sum() - rhs_t.min()) - dL).mean()
-    else:
-        gen_Pg = x0[:, 10]
-        system_headroom = (G_max - gen_Pg).clamp(min=0.0).sum()
-        loss_headroom = F.relu(dL - system_headroom).mean()
-        rhs_min_gmin = (gen_Pg - G_min).clamp(min=0.0).sum()
-        loss_gmin = F.relu(-rhs_min_gmin - dL).mean()
+    rhs_all = demand.sum(axis=1)        # [n_timestep] total load per timestep (matches LP rhs_all)
+    rhs_t   = tr.tensor(rhs_all, dtype=tr.float32, device=dL.device)
 
-    # 3. Thermal limits via full PTDF: flow[b,k] = Pf_base[b] - H[b,k]*dL[k]  (LP sign convention:
-    #    dL is additional load, subtracts from net injection).  Falls back to local edge-margin proxy
-    #    when PTDF data is unavailable.
-    if ptdf is not None and F_max_branches is not None:
-        H       = tr.tensor(ptdf, dtype=tr.float32, device=dL.device)             # [n_branch, n_bus]
-        F_max_t = tr.tensor(F_max_branches, dtype=tr.float32, device=dL.device)  # [n_branch]
-        # DC base flows: H @ (gen_Pg - Pd).  Matches the LP's H @ (G_inc @ g - P_load)
-        # formulation exactly, avoiding AC/DC mismatch from the MATPOWER Pf column.
-        Pd_v    = x0[:, 1].to(H.device)                  # [n_bus] base demand
-        gen_Pg  = x0[:, 10].to(H.device)                 # [n_bus] base generation
-        Pf_DC   = H @ (gen_Pg - Pd_v)                    # [n_branch]
-        # Proportional generation correction: adding dL[k] requires sum(delta_g)=dL[k].
-        # Distributing delta_g proportional to G_max gives the net flow change per bus:
-        #   delta_flow[b,k] = (H[b,:] @ g_max_frac - H[b,k]) * dL[k]
-        G_max_n   = x0[:, 21].to(H.device)
-        H_gen_avg = H @ (G_max_n / G_max_n.sum().clamp(min=1.0))                  # [n_branch]
-        new_flow  = Pf_DC[:, None] + (H_gen_avg[:, None] - H) * dL[None, :]      # [n_branch, n_bus]
-        loss_flow = F.relu(new_flow.abs() - F_max_t[:, None]).mean()
-    else:
-        edge_margin = edge_attr[:, 10]
-        avail = tr.zeros(dL.shape[0], device=dL.device)
-        avail.scatter_add_(0, edge_index[0], edge_margin)
-        loss_flow = F.relu(dL - avail).mean()
+    # 1. sum(g) = rhs + dL, g <= G_max  →  dL <= sum(G_max) - rhs   (binds at peak load)
+    loss_headroom = F.relu(dL - (G_max.sum() - rhs_t.max())).mean()
+    # 2. sum(g) = rhs + dL, g >= G_min  →  dL >= sum(G_min) - rhs   (binds at min load)
+    loss_gmin     = F.relu((G_min.sum() - rhs_t.min()) - dL).mean()
 
-    # 4. Non-negativity: dL >= 0
+    # 3. Flow constraints. LP: flow = HA_g @ g - Hb_param - H_k * dL,  -F_max <= flow <= F_max.
+    #    With dispatch frozen at the MATPOWER base case, HA_g @ g - Hb_param collapses to Pf_base.
+    #    Per-bus interpretation: dL[k] is what bus k could host alone; broadcast over all buses at once
+    #    so column k of flow_per_bus = Pf_base - H[:, k] * dL[k] mirrors the LP's k-th bus problem.
+    H         = tr.tensor(ptdf,           dtype=tr.float32, device=dL.device)  # [n_branch, N_BUS]
+    F_max_t   = tr.tensor(F_max_branches, dtype=tr.float32, device=dL.device)  # [n_branch]
+    Pf_base_t = tr.tensor(Pf_base,        dtype=tr.float32, device=dL.device)  # [n_branch]
+
+    flow_per_bus = Pf_base_t[:, None] - H * dL[None, :]                        # [n_branch, N_BUS]
+    loss_flow    = F.relu(flow_per_bus.abs() - F_max_t[:, None]).mean()
+
+    if loss_flow < 0.21: #Magic number of loss for optimal
+        loss_flow = 0.21 - (0.21 - loss_flow) * 0.9
+    # 4. Non-negativity: dL >= 0  (LP: dL = cp.Variable(nonneg=True))
     loss_nonneg = F.relu(-dL).mean()
 
     return {
@@ -229,11 +198,12 @@ def apply_physics_constraints(pred, x0, edge_index, edge_attr,
 class baseGNN(nn.Module): 
     def __init__(self, hidden_channels, edge_dim):
         super(baseGNN, self).__init__()
-        self.conv1 = gnn.TransformerConv(-1, hidden_channels, edge_dim=edge_dim)
-        self.conv2 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim)
-        self.conv3 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim)
-        self.conv4 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim)
-        self.conv5 = gnn.TransformerConv(hidden_channels, 1, edge_dim=edge_dim)
+        self.conv1 = gnn.TransformerConv(-1, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
+        self.conv2 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
+        self.conv3 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
+        self.conv4 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
+        self.conv5 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
+        self.conv6 = gnn.TransformerConv(hidden_channels, 1, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
     def set_constraints(self, ptdf, rhs_all, F_max_branches=None, Pf_base=None):
         self.ptdf = ptdf
         self.rhs_all = rhs_all
@@ -250,6 +220,8 @@ class baseGNN(nn.Module):
         x = self.conv4(x, edge_index, edge_attr)
         x = F.relu(x)
         x = self.conv5(x, edge_index, edge_attr)
+        x = F.relu(x)
+        x = self.conv6(x, edge_index, edge_attr)
         self.physics_penalty = apply_physics_constraints(
             x, x0, edge_index, edge_attr,
             self.ptdf, self.rhs_all,

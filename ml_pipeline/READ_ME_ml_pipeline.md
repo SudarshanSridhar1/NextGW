@@ -15,6 +15,11 @@ A similar structure is shown with _11_branchWestern to _16_hosting_capacity_west
 
 All csvs are made with _01_to_csv.py.
 
+## Outputs
+For outputs, each one is labeled by date. Each has basic information about the run at the top.
+
+Loss plots are deleted and kept as wanted, as to not clutter the folder.
+
 ## Files
 All files are as follows:
     _01_to_csv.py - transforms .mat file into the csvs
@@ -31,9 +36,7 @@ For more info, you can read the files yourself :) I'm not writing more of this r
 Progress needs to be made on:
     Checking if Physics Constraints are implemented correctly. Ground truth of _06_texas_v0.csv still violates physics constraints very slightly, by 0.02MW on average. Within margin of error, but it would be nice if we could check if these criteria are correct.
     Actually optimizing the model; I haven't started yet :D
-    Fix .sh script, seemingly not running on CPU cluster
-    Maybe a COPILOT.md/CLAUDE.md file
-
+    Writing a COPILOT.md/CLAUDE.md file
 
 ## Dependencies
 ```

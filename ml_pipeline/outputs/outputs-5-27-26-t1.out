@@ -1,0 +1,11 @@
+Working directory: /scratch/negishi/mei75/other-chud-projects/gw/ml_pipeline
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) xalt/3.0.2
+Traceback (most recent call last):
+  File "/scratch/negishi/mei75/other-chud-projects/gw/ml_pipeline/_06_training.py", line 5, in <module>
+    from _03_graph_construction import graph_data, baseGNN
+  File "/scratch/negishi/mei75/other-chud-projects/gw/ml_pipeline/_03_graph_construction.py", line 16, in <module>
+    from data.Texas.ptdf import compute_ptdf
+ModuleNotFoundError: No module named 'data'

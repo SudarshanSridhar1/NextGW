@@ -1,0 +1,6 @@
+Working directory: /scratch/negishi/mei75/other-chud-projects/gw/
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) xalt/3.0.2
+slurmstepd: error: *** JOB 37972350 ON a189 CANCELLED AT 2026-05-27T12:42:59 DUE TO TIME LIMIT ***

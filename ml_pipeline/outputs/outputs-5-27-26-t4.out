@@ -1,0 +1,129 @@
+Working directory: /scratch/negishi/mei75/other-chud-projects/gw/
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) xalt/3.0.2
+Environment loaded: py-gnn-env-py3.12.11
+/apps/external/apps/conda/2025.09/bin/python
+Python 3.12.11
+Starting training script...
+Loading data... (5.60s)
+Constructing model... (15.75s)
+Starting training... (18.90s)
+model: OptimizedModule(
+  (_orig_mod): baseGNN(
+    (conv1): TransformerConv(-1, 64, heads=4)
+    (conv2): TransformerConv(64, 64, heads=4)
+    (conv3): TransformerConv(64, 64, heads=4)
+    (conv4): TransformerConv(64, 64, heads=4)
+    (conv5): TransformerConv(64, 64, heads=4)
+    (conv6): TransformerConv(64, 1, heads=4)
+  )
+)
+data: HeteroData(
+  bus={
+    x=[2000, 25],
+    y=[2000, 1],
+  },
+  (bus, wire, bus)={
+    edge_index=[2, 5334],
+    edge_attr=[5334, 11],
+  }
+)
+criterion: MSELoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    decoupled_weight_decay: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: True
+    lr: 0.001
+    maximize: False
+    weight_decay: 0
+)
+device: cpu
+save_location: None
+name: Train Test
+gradient_location: None
+Traceback (most recent call last):
+  File "/scratch/negishi/mei75/other-chud-projects/gw/ml_pipeline/_06_training.py", line 46, in <module>
+    tchart, vchart, model = trainer.train_loop(
+                            ^^^^^^^^^^^^^^^^^^^
+  File "/scratch/negishi/mei75/other-chud-projects/gw/ml_pipeline/_05_gnn_trainer.py", line 103, in train_loop
+    outputs = self._forward()
+              ^^^^^^^^^^^^^^^
+  File "/scratch/negishi/mei75/other-chud-projects/gw/ml_pipeline/_05_gnn_trainer.py", line 48, in _forward
+    return self.model(
+           ^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 473, in __call__
+    return super().__call__(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1062, in compile_wrapper
+    raise e.remove_dynamo_frames() from None  # see TORCHDYNAMO_VERBOSE=1
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1069, in _compile_fx_inner
+    raise InductorError(e, currentframe()).with_traceback(
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1049, in _compile_fx_inner
+    mb_compiled_graph = fx_codegen_and_compile(
+                        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1836, in fx_codegen_and_compile
+    return scheme.codegen_and_compile(gm, example_inputs, inputs_to_check, graph_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/compile_fx.py", line 1597, in codegen_and_compile
+    compiled_module = graph.compile_to_module()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2613, in compile_to_module
+    return self._compile_to_module()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2623, in _compile_to_module
+    mod = self._compile_to_module_lines(wrapper_code)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/graph.py", line 2698, in _compile_to_module_lines
+    mod = PyCodeCache.load_by_key_path(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/codecache.py", line 3976, in load_by_key_path
+    mod = _reload_python_module(key, path, set_sys_modules=in_toplevel)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/runtime/compile_tasks.py", line 35, in _reload_python_module
+    exec(code, mod.__dict__, mod.__dict__)
+  File "/tmp/torchinductor_mei75/j2/cj2w3lannnycpqr32skyjgt67hjylge2ocglknb6euufngsu46oo.py", line 33, in <module>
+    cpp_fused_copy__0 = async_compile.cpp_pybinding(['const float*', 'float*'], r'''
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/async_compile.py", line 535, in cpp_pybinding
+    get_result = CppPythonBindingsCodeCache.load_pybinding_async(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/codecache.py", line 3433, in load_pybinding_async
+    get_result = cls.load_async(
+                 ^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/codecache.py", line 3165, in load_async
+    main_build_option.precompiled_header = _precompile_header(
+                                           ^^^^^^^^^^^^^^^^^^^
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/codecache.py", line 2989, in _precompile_header
+    preprocessor.build()
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/cpp_builder.py", line 2439, in build
+    run_compile_cmd(build_cmd, cwd=_build_tmp_dir)
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/cpp_builder.py", line 688, in run_compile_cmd
+    _run_compile_cmd(cmd_line, cwd)
+  File "/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/_inductor/cpp_builder.py", line 683, in _run_compile_cmd
+    raise exc.CppCompileError(cmd, output) from e
+torch._inductor.exc.InductorError: CppCompileError: C++ compile error
+
+Command:
+g++ /tmp/tmpdwmwee7k/header.hpp -D TORCH_INDUCTOR_CPP_WRAPPER -D STANDALONE_TORCH_HEADER -D TORCH_INDUCTOR_PRECOMPILE_HEADERS -D C10_USING_CUSTOM_GENERATED_MACROS -O3 -DNDEBUG -fno-trapping-math -funsafe-math-optimizations -ffinite-math-only -fno-signed-zeros -fno-math-errno -fno-finite-math-only -fno-unsafe-math-optimizations -ffp-contract=off -fexcess-precision=fast -fno-tree-loop-vectorize -march=native -fPIC -Wall -std=c++20 -Wno-unused-variable -Wno-unknown-pragmas -pedantic -fopenmp -I/apps/external/apps/conda/2025.09/include/python3.12 -I/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/include -I/home/mei75/.conda/envs/py-gnn-env/lib/python3.12/site-packages/torch/include/torch/csrc/api/include -E -P -o /tmp/tmpdwmwee7k/header.i
+
+Output:
+g++: error: unrecognized command line option ‘-std=c++20’; did you mean ‘-std=c++2a’?
+
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+

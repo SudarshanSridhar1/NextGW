@@ -13,7 +13,7 @@ MODEL_PATH  = r"ml_pipeline\outputs\checkpoint.pth"  # used when SOURCE = "model
 VERBOSE     = False   # True: print per-bus violation table for failed constraints
 # ------------------------------------------------------------------ #
 
-data, ptdf, rhs_all, F_max_branches, Pf_base = graph_data(CASE, cluster=False)
+data, ptdf, rhs_all, F_max_branches, Pf_base = graph_data(CASE)
 
 x0         = data["bus"].x
 edge_index = data["bus", "wire", "bus"].edge_index

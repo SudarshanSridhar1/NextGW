@@ -119,6 +119,7 @@ class train:
 
             if epoch % 250 == 0:
                 print(f"Epoch {epoch+1:>6}, Loss: {running_loss:.4f}, at {time.time() - start_time:.2f}s")
+                print(f"Validation Loss: {self.validate(returnResults=False, printinfo=False):.4f}")
                 print(f"Current penalty: {running_penalty:.4f}, rest of loss: {running_loss - running_penalty:.4f}")
                 print(f"Headroom penalty: {self.model.physics_penalty['headroom']:.4f}, Gen Min penalty: {self.model.physics_penalty['gen_min']:.4f}, Flow penalty: {self.model.physics_penalty['flow']:.4f}, Non-negativity penalty: {self.model.physics_penalty['nonneg']:.4f}")
                 print(f"LR at end of epoch {epoch+1}: {self.optimizer.param_groups[0]['lr']:.6f}")
