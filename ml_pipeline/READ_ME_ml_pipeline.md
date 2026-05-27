@@ -20,6 +20,11 @@ For outputs, each one is labeled by date. Each has basic information about the r
 
 Loss plots are deleted and kept as wanted, as to not clutter the folder.
 
+Short logs of changes:
+    5-27-26-t3.out - first successful train, along with overfitting with points at ~250 MSE Train
+    5-27-26-t5.out - dropout + more attention heads, slightly less overfitting but worse on Train
+    5-27-26-t6.out - virtual node for globality, from ~250k to ~120k MSE Val.
+
 ## Files
 All files are as follows:
     _01_to_csv.py - transforms .mat file into the csvs
@@ -35,7 +40,7 @@ For more info, you can read the files yourself :) I'm not writing more of this r
 ## List of Needed Additions
 Progress needs to be made on:
     Checking if Physics Constraints are implemented correctly. Ground truth of _06_texas_v0.csv still violates physics constraints very slightly, by 0.02MW on average. Within margin of error, but it would be nice if we could check if these criteria are correct.
-    Actually optimizing the model; I haven't started yet :D
+    Optimizing the model for accuracy, and also importantly, speed; 8 epochs/s is awkwardly slow and prevents longer trains, though longer trains may not be necessary?
     Writing a COPILOT.md/CLAUDE.md file
 
 ## Dependencies

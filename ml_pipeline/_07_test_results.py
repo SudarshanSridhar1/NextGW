@@ -1,7 +1,7 @@
 import pandas as pd
 import torch as tr
 
-from _03_graph_construction import graph_data, apply_physics_constraints, baseGNN
+from _03_graph_construction import graph_data, apply_physics_constraints, baseGNN, virtualNodeGNN
 
 # ------------------------------------------------------------------ #
 # CONFIGURATION – change these variables to test different results
@@ -10,6 +10,7 @@ CASE        = "texas"                          # "texas" or "western"
 SOURCE      = "csv"                            # "csv" or "model"
 CSV_PATH    = r"results\texas_v0.csv"          # used when SOURCE = "csv"
 MODEL_PATH  = r"ml_pipeline\outputs\checkpoint.pth"  # used when SOURCE = "model"
+MODEL_TYPE  = "virtual"                        # "base" or "virtual" (used when SOURCE = "model")
 VERBOSE     = False   # True: print per-bus violation table for failed constraints
 # ------------------------------------------------------------------ #
 
@@ -44,7 +45,12 @@ elif SOURCE == "model":
         state_dict = checkpoint["state_dict"]
     else:
         state_dict = checkpoint
-    model = baseGNN(hidden_channels=64, edge_dim=edge_attr.shape[1])
+    if MODEL_TYPE == "virtual":
+        model = virtualNodeGNN(hidden_channels=64, edge_dim=edge_attr.shape[1])
+    elif MODEL_TYPE == "base":
+        model = baseGNN(hidden_channels=64, edge_dim=edge_attr.shape[1])
+    else:
+        raise ValueError(f"MODEL_TYPE must be 'base' or 'virtual', got '{MODEL_TYPE}'.")
     model.load_state_dict(state_dict)
     model.eval()
     with tr.no_grad():

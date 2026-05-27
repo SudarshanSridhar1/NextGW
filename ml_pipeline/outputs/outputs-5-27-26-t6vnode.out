@@ -1,0 +1,194 @@
+Working directory: /scratch/negishi/mei75/other-chud-projects/gw/
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) xalt/3.0.2
+Environment loaded: py-gnn-env-py3.12.11
+/apps/external/apps/conda/2025.09/bin/python
+Python 3.12.11
+Starting training script...
+Loading data... (7.45s)
+Constructing model... (9.67s)
+Starting training... (9.72s)
+model: virtualNodeGNN(
+  (conv1): TransformerConv(-1, 64, heads=4)
+  (conv2): TransformerConv(64, 64, heads=4)
+  (conv3): TransformerConv(64, 64, heads=4)
+  (conv4): TransformerConv(64, 64, heads=4)
+  (conv5): TransformerConv(64, 64, heads=4)
+  (conv6): TransformerConv(64, 1, heads=4)
+  (vn_mlp1): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+  (vn_mlp2): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+  (vn_mlp3): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+  (vn_mlp4): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+  (vn_mlp5): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+)
+data: HeteroData(
+  bus={
+    x=[2000, 25],
+    y=[2000, 1],
+  },
+  (bus, wire, bus)={
+    edge_index=[2, 5334],
+    edge_attr=[5334, 11],
+  }
+)
+criterion: MSELoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    decoupled_weight_decay: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: True
+    lr: 0.001
+    maximize: False
+    weight_decay: 0
+)
+device: cpu
+save_location: None
+name: Train Test
+gradient_location: None
+Epoch      1, Loss: 141896.2250, at 8.55s
+Validation Loss: 2375138.5000
+Current penalty: 12309.4053, rest of loss: 129586.8197
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.0223, Non-negativity penalty: 3.4228
+LR at end of epoch 1: 0.001000
+Epoch    251, Loss: 114171.0505, at 58.19s
+Validation Loss: 172882.5781
+Current penalty: 1257.8686, rest of loss: 112913.1818
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1737, Non-negativity penalty: 0.0000
+LR at end of epoch 251: 0.001000
+Epoch    501, Loss: 97952.3995, at 86.31s
+Validation Loss: 156815.5938
+Current penalty: 1739.8871, rest of loss: 96212.5125
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1529, Non-negativity penalty: 0.2977
+LR at end of epoch 501: 0.001000
+Epoch    751, Loss: 49971.4103, at 114.83s
+Validation Loss: 128349.5547
+Current penalty: 1128.8013, rest of loss: 48842.6089
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1874, Non-negativity penalty: 0.0000
+LR at end of epoch 751: 0.001000
+Epoch   1001, Loss: 44642.7818, at 143.79s
+Validation Loss: 144229.0312
+Current penalty: 1101.7406, rest of loss: 43541.0412
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1975, Non-negativity penalty: 0.0000
+LR at end of epoch 1001: 0.001000
+Epoch   1251, Loss: 33237.7746, at 172.79s
+Validation Loss: 118264.5391
+Current penalty: 1072.4496, rest of loss: 32165.3250
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1941, Non-negativity penalty: 0.0000
+LR at end of epoch 1251: 0.001000
+Epoch   1501, Loss: 24520.2937, at 201.39s
+Validation Loss: 130202.5312
+Current penalty: 1067.2801, rest of loss: 23453.0136
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.2075, Non-negativity penalty: 0.0000
+LR at end of epoch 1501: 0.001000
+Epoch   1751, Loss: 23026.1221, at 229.02s
+Validation Loss: 145491.7812
+Current penalty: 1086.2657, rest of loss: 21939.8565
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.2003, Non-negativity penalty: 0.0000
+LR at end of epoch 1751: 0.001000
+Epoch   2001, Loss: 25915.2677, at 256.90s
+Validation Loss: 127828.0703
+Current penalty: 1068.6746, rest of loss: 24846.5931
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.2117, Non-negativity penalty: 0.0000
+LR at end of epoch 2001: 0.001000
+Epoch   2251, Loss: 23286.2982, at 284.74s
+Validation Loss: 128265.8984
+Current penalty: 1072.5091, rest of loss: 22213.7892
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.2089, Non-negativity penalty: 0.0000
+LR at end of epoch 2251: 0.001000
+Epoch   2501, Loss: 20934.0551, at 313.74s
+Validation Loss: 125233.5625
+Current penalty: 1086.3735, rest of loss: 19847.6816
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1956, Non-negativity penalty: 0.0000
+LR at end of epoch 2501: 0.001000
+Epoch   2751, Loss: 16910.8870, at 342.76s
+Validation Loss: 114932.3906
+Current penalty: 1058.9550, rest of loss: 15851.9320
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1986, Non-negativity penalty: 0.0000
+LR at end of epoch 2751: 0.001000
+Epoch   6001, Loss: 9153.2482, at 781.30s
+Validation Loss: 131310.0781
+Current penalty: 1044.0163, rest of loss: 8109.2319
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.2011, Non-negativity penalty: 0.0000
+LR at end of epoch 6001: 0.001000
+Epoch   6251, Loss: 8729.7955, at 807.57s
+Validation Loss: 127561.1797
+Current penalty: 1041.9954, rest of loss: 7687.8001
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1923, Non-negativity penalty: 0.0000
+LR at end of epoch 6251: 0.001000
+Epoch   6501, Loss: 7160.1598, at 843.10s
+Validation Loss: 121852.9375
+Current penalty: 1023.2712, rest of loss: 6136.8885
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1917, Non-negativity penalty: 0.0000
+LR at end of epoch 6501: 0.001000
+Epoch   6751, Loss: 7162.3867, at 867.87s
+Validation Loss: 119971.5859
+Current penalty: 1020.7879, rest of loss: 6141.5988
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1860, Non-negativity penalty: 0.0000
+LR at end of epoch 6751: 0.001000
+Epoch   7001, Loss: 7819.8084, at 891.65s
+Validation Loss: 123212.4609
+Current penalty: 1032.2128, rest of loss: 6787.5956
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1848, Non-negativity penalty: 0.0176
+LR at end of epoch 7001: 0.001000
+Epoch   7251, Loss: 6234.7317, at 915.36s
+Validation Loss: 138976.7812
+Current penalty: 1019.9431, rest of loss: 5214.7886
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1895, Non-negativity penalty: 0.0000
+LR at end of epoch 7251: 0.001000
+Epoch   7501, Loss: 8462.9167, at 939.25s
+Validation Loss: 128982.4062
+Current penalty: 1042.8811, rest of loss: 7420.0356
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1850, Non-negativity penalty: 0.0000
+LR at end of epoch 7501: 0.001000
+Epoch   7751, Loss: 7171.3461, at 962.86s
+Validation Loss: 119884.1641
+Current penalty: 1013.5131, rest of loss: 6157.8330
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1887, Non-negativity penalty: 0.0000
+LR at end of epoch 7751: 0.001000
+Epoch   8001, Loss: 7431.8058, at 986.97s
+Validation Loss: 133195.7500
+Current penalty: 1029.1697, rest of loss: 6402.6361
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1806, Non-negativity penalty: 0.0000
+LR at end of epoch 8001: 0.001000
+Epoch   8251, Loss: 8114.2343, at 1011.52s
+Validation Loss: 132737.4219
+Current penalty: 1027.1700, rest of loss: 7087.0643
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1972, Non-negativity penalty: 0.0000
+LR at end of epoch 8251: 0.001000
+Epoch   8501, Loss: 6527.4868, at 1036.23s
+Validation Loss: 133893.0625
+Current penalty: 1036.3230, rest of loss: 5491.1638
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1980, Non-negativity penalty: 0.0000
+LR at end of epoch 8501: 0.001000
+Epoch   8751, Loss: 6505.6059, at 1061.51s
+Validation Loss: 143813.9531
+Current penalty: 1027.1155, rest of loss: 5478.4904
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1872, Non-negativity penalty: 0.0000
+LR at end of epoch 8751: 0.001000

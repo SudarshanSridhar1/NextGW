@@ -196,14 +196,15 @@ def apply_physics_constraints(pred, x0, edge_index, edge_attr,
 
 
 class baseGNN(nn.Module): 
-    def __init__(self, hidden_channels, edge_dim):
+    def __init__(self, hidden_channels, edge_dim, dropout=0.1, dropout_base=0):
         super(baseGNN, self).__init__()
-        self.conv1 = gnn.TransformerConv(-1, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
-        self.conv2 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
-        self.conv3 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
-        self.conv4 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
-        self.conv5 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
-        self.conv6 = gnn.TransformerConv(hidden_channels, 1, edge_dim=edge_dim, heads=4, concat=False, dropout=0.1)
+        self.conv1 = gnn.TransformerConv(-1, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.conv2 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.conv3 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.conv4 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.conv5 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.conv6 = gnn.TransformerConv(hidden_channels, 1, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.dropout = nn.Dropout(dropout_base)
     def set_constraints(self, ptdf, rhs_all, F_max_branches=None, Pf_base=None):
         self.ptdf = ptdf
         self.rhs_all = rhs_all
@@ -213,15 +214,85 @@ class baseGNN(nn.Module):
         x0 = x
         x = self.conv1(x, edge_index, edge_attr)
         x = F.relu(x)
+        x = self.dropout(x)
         x = self.conv2(x, edge_index, edge_attr)
         x = F.relu(x)
+        x = self.dropout(x)
         x = self.conv3(x, edge_index, edge_attr)
         x = F.relu(x)
+        x = self.dropout(x)
         x = self.conv4(x, edge_index, edge_attr)
         x = F.relu(x)
+        x = self.dropout(x)
         x = self.conv5(x, edge_index, edge_attr)
         x = F.relu(x)
+        x = self.dropout(x)
         x = self.conv6(x, edge_index, edge_attr)
+        self.physics_penalty = apply_physics_constraints(
+            x, x0, edge_index, edge_attr,
+            self.ptdf, self.rhs_all,
+            getattr(self, 'F_max_branches', None),
+            getattr(self, 'Pf_base', None)
+        )
+        return x
+
+class virtualNodeGNN(nn.Module):
+    def __init__(self, hidden_channels, edge_dim, dropout=0.1, dropout_base=0):
+        super(virtualNodeGNN, self).__init__()
+        self.conv1 = gnn.TransformerConv(-1, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.conv2 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.conv3 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.conv4 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.conv5 = gnn.TransformerConv(hidden_channels, hidden_channels, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.conv6 = gnn.TransformerConv(hidden_channels, 1, edge_dim=edge_dim, heads=4, concat=False, dropout=dropout)
+        self.virtualnode = nn.Parameter(tr.zeros(1, hidden_channels))
+        self.vn_mlp1 = nn.Sequential(nn.Linear(hidden_channels, hidden_channels), nn.ReLU(), nn.Linear(hidden_channels, hidden_channels))
+        self.vn_mlp2 = nn.Sequential(nn.Linear(hidden_channels, hidden_channels), nn.ReLU(), nn.Linear(hidden_channels, hidden_channels))
+        self.vn_mlp3 = nn.Sequential(nn.Linear(hidden_channels, hidden_channels), nn.ReLU(), nn.Linear(hidden_channels, hidden_channels))
+        self.vn_mlp4 = nn.Sequential(nn.Linear(hidden_channels, hidden_channels), nn.ReLU(), nn.Linear(hidden_channels, hidden_channels))
+        self.vn_mlp5 = nn.Sequential(nn.Linear(hidden_channels, hidden_channels), nn.ReLU(), nn.Linear(hidden_channels, hidden_channels))
+        self.dropout = nn.Dropout(dropout_base)
+    def set_constraints(self, ptdf, rhs_all, F_max_branches=None, Pf_base=None):
+        self.ptdf = ptdf
+        self.rhs_all = rhs_all
+        self.F_max_branches = F_max_branches
+        self.Pf_base = Pf_base
+    def _inject_virtual_node(self, x, virtual_state, mlp):
+        pooled = x.mean(dim=0, keepdim=True)
+        virtual_state = virtual_state + mlp(pooled)
+        x = x + virtual_state.expand_as(x)
+        return x, virtual_state
+    def forward(self, x, edge_index, edge_attr):
+        x0 = x
+        virtual_state = self.virtualnode
+
+        x = self.conv1(x, edge_index, edge_attr)
+        x = F.leaky_relu(x, negative_slope=0.01)
+        x, virtual_state = self._inject_virtual_node(x, virtual_state, self.vn_mlp1)
+        x = self.dropout(x)
+
+        x = self.conv2(x, edge_index, edge_attr)
+        x = F.leaky_relu(x, negative_slope=0.01)
+        x, virtual_state = self._inject_virtual_node(x, virtual_state, self.vn_mlp2)
+        x = self.dropout(x)
+
+        x = self.conv3(x, edge_index, edge_attr)
+        x = F.leaky_relu(x, negative_slope=0.01)
+        x, virtual_state = self._inject_virtual_node(x, virtual_state, self.vn_mlp3)
+        x = self.dropout(x)
+
+        x = self.conv4(x, edge_index, edge_attr)
+        x = F.leaky_relu(x, negative_slope=0.01)
+        x, virtual_state = self._inject_virtual_node(x, virtual_state, self.vn_mlp4)
+        x = self.dropout(x)
+
+        x = self.conv5(x, edge_index, edge_attr)
+        x = F.leaky_relu(x, negative_slope=0.01)
+        x, virtual_state = self._inject_virtual_node(x, virtual_state, self.vn_mlp5)
+        x = self.dropout(x)
+
+        x = self.conv6(x, edge_index, edge_attr)
+
         self.physics_penalty = apply_physics_constraints(
             x, x0, edge_index, edge_attr,
             self.ptdf, self.rhs_all,

@@ -6,7 +6,7 @@ import os
 start_time = time.time()
 print("Starting training script...")
 
-from _03_graph_construction import graph_data, baseGNN
+from _03_graph_construction import graph_data, baseGNN, virtualNodeGNN
 from _05_gnn_trainer import train
 
 tr.set_num_threads(6)
@@ -18,7 +18,8 @@ data, ptdf, rhs_all, F_max_branches, Pf_base = graph_data("texas")
 
 print(f"Constructing model... ({time.time()-start_time:.2f}s)")
 
-model = baseGNN(hidden_channels=64, edge_dim=data["bus", "wire", "bus"].edge_attr.shape[1])
+#model = baseGNN(hidden_channels=64, edge_dim=data["bus", "wire", "bus"].edge_attr.shape[1])
+model = virtualNodeGNN(hidden_channels=64, edge_dim=data["bus", "wire", "bus"].edge_attr.shape[1], dropout=0.1, dropout_base = 0.05)
 model.set_constraints(ptdf, rhs_all, F_max_branches, Pf_base)
 
 criterion = nn.MSELoss()

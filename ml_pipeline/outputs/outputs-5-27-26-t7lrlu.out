@@ -1,0 +1,105 @@
+Working directory: /scratch/negishi/mei75/other-chud-projects/gw/
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) xalt/3.0.2
+Environment loaded: py-gnn-env-py3.12.11
+/apps/external/apps/conda/2025.09/bin/python
+Python 3.12.11
+Starting training script...
+Loading data... (5.69s)
+Constructing model... (7.81s)
+Starting training... (7.85s)
+model: virtualNodeGNN(
+  (conv1): TransformerConv(-1, 64, heads=4)
+  (conv2): TransformerConv(64, 64, heads=4)
+  (conv3): TransformerConv(64, 64, heads=4)
+  (conv4): TransformerConv(64, 64, heads=4)
+  (conv5): TransformerConv(64, 64, heads=4)
+  (conv6): TransformerConv(64, 1, heads=4)
+  (vn_mlp1): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+  (vn_mlp2): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+  (vn_mlp3): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+  (vn_mlp4): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+  (vn_mlp5): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+  (dropout): Dropout(p=0.05, inplace=False)
+)
+data: HeteroData(
+  bus={
+    x=[2000, 25],
+    y=[2000, 1],
+  },
+  (bus, wire, bus)={
+    edge_index=[2, 5334],
+    edge_attr=[5334, 11],
+  }
+)
+criterion: MSELoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    decoupled_weight_decay: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: True
+    lr: 0.001
+    maximize: False
+    weight_decay: 0
+)
+device: cpu
+save_location: None
+name: Train Test
+gradient_location: None
+Epoch      1, Loss: 133746.5750, at 0.84s
+Validation Loss: 2593547.5000
+Current penalty: 21591.0378, rest of loss: 112155.5372
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.0212, Non-negativity penalty: 0.2578
+LR at end of epoch 1: 0.001000
+Epoch    251, Loss: 120001.9572, at 30.59s
+Validation Loss: 225399.5938
+Current penalty: 1114.1615, rest of loss: 118887.7958
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1805, Non-negativity penalty: 0.0000
+LR at end of epoch 251: 0.001000
+Epoch    501, Loss: 78336.9055, at 61.13s
+Validation Loss: 208368.0000
+Current penalty: 1142.2483, rest of loss: 77194.6572
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1980, Non-negativity penalty: 0.0000
+LR at end of epoch 501: 0.001000
+Epoch    751, Loss: 60345.3719, at 89.53s
+Validation Loss: 207048.1406
+Current penalty: 1074.2476, rest of loss: 59271.1243
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1917, Non-negativity penalty: 0.0000
+LR at end of epoch 751: 0.001000
+Epoch   1001, Loss: 59334.8295, at 119.65s
+Validation Loss: 223999.9375
+Current penalty: 1236.5892, rest of loss: 58098.2404
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1839, Non-negativity penalty: 0.0000
+LR at end of epoch 1001: 0.001000
+Epoch   1251, Loss: 40215.6796, at 152.56s
+Validation Loss: 191841.0781
+Current penalty: 1061.3260, rest of loss: 39154.3536
+Headroom penalty: 0.0000, Gen Min penalty: 0.0000, Flow penalty: 0.1888, Non-negativity penalty: 0.0000
+LR at end of epoch 1251: 0.001000
